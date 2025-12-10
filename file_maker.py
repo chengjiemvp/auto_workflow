@@ -57,7 +57,7 @@ class FileMaker:
             self.cursor.execute("select * from sessions where username = ? AND hostname = ?", 
                                 ("cheng.jie", hostname, ))
             session_data = self.cursor.fetchone()[2]
-            self.context = self.browser.new_context(storage_state=json.loads(json.loads(session_data)), 
+            self.context = self.browser.new_context(storage_state=json.loads(session_data), 
                                                     user_agent=self.user_agent_str)
             self._cookie = True
         except sqlite3.OperationalError:
@@ -84,17 +84,18 @@ class FileMaker:
             self.page.click("input[name='remember']")
             time.sleep(random.uniform(0.1, 0.5))
             self.page.click('input[value="Login"]')
-        self.page.wait_for_selector('//div[contains(text(), "Ocean Import (")]', state='visible')
+        self.page.wait_for_selector('''//div[contains(text(), "Ocean Import (")]''', state='visible')
         output(f'[log] logged in')
-        while True:
-            if len(self.context.cookies()) > 0:
-                print(f"[log] cookies obtained")
-                self.context.storage_state(path="auth.json")
-                with open("auth.json", "r") as f:
-                    print(f"{f.read()}")
-            else:
-                pass
-            time.sleep(5)
+        if len(self.context.cookies()) > 0:
+            new_cookies = self.context.storage_state()
+            output(f"[log] cookies eg: name:{new_cookies['cookies'][0]['name']}")
+            new_cookies_str = json.dumps(new_cookies)
+            self.cursor.execute("UPDATE sessions SET session_data = ? WHERE username = ? AND hostname = ?", 
+                                (new_cookies_str, "cheng.jie", socket.gethostname()))
+            self.conn.commit()
+        else:
+            output("[err] no cookies found")
+            raise Exception("no cookies found")
         return True
 
     def get_user(self):
@@ -113,7 +114,7 @@ class FileMaker:
 
     def create_file(self):
         return None
-    
+
     def get_working_list(self):
         return True
 
