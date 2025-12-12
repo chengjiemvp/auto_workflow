@@ -1,6 +1,6 @@
 import pandas as pd
 
-def working_list():
+def get_list():
     df = pd.read_excel('./TEST.xlsx', sheet_name='WorkingShips')
     new_df = df[df['OI'].isna() & df['Date'].notna()]
 
@@ -19,10 +19,17 @@ def working_list():
         new_df['DODate'].notna() &
         new_df['Terminal'].notna() &
         new_df['TrainSta'].notna() &
-        new_df['Destination'].notna()
+        new_df['Destination'].notna() &
+        new_df['Vessel'].notna() &
+        new_df['Voyage'].notna() &
+        new_df['Remarks'].notna() &
+        new_df['Description'].notna() &
+        new_df['Marks'].notna()
         ]
 
-    for key,value in working_lists.iterrows():
-        print(f"{key}:========================================\n{value}")
-        
     return working_lists
+
+# working_list = get_list()
+# for index, row in working_list.iterrows():
+#     print(type(row))
+#     print(row['ETA'].strftime(f"%m-%d-%Y"))

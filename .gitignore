@@ -11,3 +11,4 @@ wheels/
 
 .key
 .auth.json
+~$*.xlsx
